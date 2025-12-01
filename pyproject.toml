@@ -12,4 +12,5 @@ dependencies = [
     "pydantic>=2.12.5",
     "pydantic-ai>=1.25.1",
     "pydantic-ai-slim[anthropic]>=1.25.1",
+    "tavily>=1.1.0",
 ]
