@@ -20,19 +20,19 @@ NOTE: To change level of logging, simply navigate to utils/logging.py and change
 
 - Python 3.11+
 - `uv` (recommended) or `pip`
-- make sure to run **uv sync** then run the main.py via the command **uv run python main.py**
+- make sure to run `uv sync` then run the main.py via the command `uv run python main.py`
 
 
-- Or can just use Docker setup too to run via the command **docker compose up --build -d**
-- To see docker logs in terminal (not just Docker dashboard) run **docker compose logs -f agent**
+- Or can just use Docker setup too to run via the command `docker compose up --build -d`
+- To see docker logs in terminal (not just Docker dashboard) run `docker compose logs -f agent`
 
 - NOTE: Need to create an env file that imitates the following pattern, be sure to get the corresponding keys
 and secrets from corresponding sources:
 
+  ```
   TAVILY_API_KEY=your_tavily_key_here
-  
   ALPACA_KEY=your_alpaca_key_id_here
   APCA_API_SECRET_KEY=your_alpaca_secret_key_here
   ALPACA_URL=https://paper-api.alpaca.markets/v2
-  
   ANTHROPIC_API_KEY= your_anthropic_key_here
+  ```
