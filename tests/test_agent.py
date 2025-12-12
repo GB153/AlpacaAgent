@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+from collections.abc import Callable
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -13,8 +14,6 @@ from pydantic_ai.messages import (
     ToolReturnPart,
 )
 from pydantic_ai.models.test import TestModel
-
-from core.agent import agent
 
 # schemas deps
 mock_schemas_deps = MagicMock()
@@ -57,6 +56,21 @@ mock_routing.build_model.return_value = TestModel()
 sys.modules["core.routing"] = mock_routing
 
 
+from core.agent import agent
+
+
+def _tool_then_done(first: ModelResponse) -> Callable[..., object]:
+    calls = {"n": 0}
+
+    def side_effect(*args, **kwargs) -> object:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return first
+        return ModelResponse(parts=[TextPart('{"message": "Done"}')])
+
+    return side_effect
+
+
 @pytest.fixture
 def mock_deps(mocker):
     mock_tavily_client = mocker.Mock(name="tavily_client")
@@ -72,21 +86,19 @@ def test_web_search_tool_happy_path(mocker, mock_deps):
 
     agent.model = TestModel()
     agent.model.request = AsyncMock()
-    agent.model.request.side_effect = [
-        ModelResponse(
-            parts=[
-                ToolCallPart(
-                    tool_name="web_search",
-                    args={
-                        "query": "What is the latest crypto news?",
-                        "topic": "news",
-                        "days": 7,
-                    },
-                )
-            ]
-        ),
-        ModelResponse(parts=[TextPart('{"message": "Done"}')]),
-    ]
+    first = ModelResponse(
+        parts=[
+            ToolCallPart(
+                tool_name="web_search",
+                args={
+                    "query": "What is the latest crypto news?",
+                    "topic": "news",
+                    "days": 7,
+                },
+            )
+        ]
+    )
+    agent.model.request.side_effect = _tool_then_done(first)
 
     agent.run_sync("What is the latest crypto news?", deps=mock_deps)
 
@@ -117,7 +129,9 @@ def test_create_order_happy_path(mocker, mock_deps):
 
     mock_deps.allow_trading = True
 
-    mock_response = ModelResponse(
+    agent.model = TestModel()
+    agent.model.request = AsyncMock()
+    first = ModelResponse(
         parts=[
             ToolCallPart(
                 tool_name="create_order",
@@ -125,13 +139,7 @@ def test_create_order_happy_path(mocker, mock_deps):
             )
         ]
     )
-
-    agent.model = TestModel()
-    agent.model.request = AsyncMock()
-    agent.model.request.side_effect = [
-        mock_response,
-        ModelResponse(parts=[TextPart('{"message": "Done"}')]),
-    ]
+    agent.model.request.side_effect = _tool_then_done(first)
 
     agent.run_sync("Buy $100 BTC", deps=mock_deps)
 
@@ -145,7 +153,9 @@ def test_create_order_trading_disabled(mocker, mock_deps):
     mock_create_order = mocker.patch("core.agent.alpaca_create_order")
     mock_deps.allow_trading = False
 
-    mock_response = ModelResponse(
+    agent.model = TestModel()
+    agent.model.request = AsyncMock()
+    first = ModelResponse(
         parts=[
             ToolCallPart(
                 tool_name="create_order",
@@ -153,13 +163,7 @@ def test_create_order_trading_disabled(mocker, mock_deps):
             )
         ]
     )
-
-    agent.model = TestModel()
-    agent.model.request = AsyncMock()
-    agent.model.request.side_effect = [
-        mock_response,
-        ModelResponse(parts=[TextPart('{"message": "Done"}')]),
-    ]
+    agent.model.request.side_effect = _tool_then_done(first)
 
     agent.run_sync("Sell ETH", deps=mock_deps)
 
@@ -191,24 +195,18 @@ def test_close_position_logic(mocker, mock_deps):
 
     agent.model = TestModel()
     agent.model.request = AsyncMock()
-    agent.model.request.side_effect = [
-        ModelResponse(
-            parts=[
-                ToolCallPart(
-                    tool_name="close_position",
-                    args={"symbol_or_asset_id": "BTC", "percentage": 0.5},
-                )
-            ]
-        ),
-        ModelResponse(parts=[TextPart('{"message": "Done"}')]),
-    ]
+    first = ModelResponse(
+        parts=[
+            ToolCallPart(
+                tool_name="close_position",
+                args={"symbol_or_asset_id": "BTC", "percentage": 0.5},
+            )
+        ]
+    )
+    agent.model.request.side_effect = _tool_then_done(first)
 
     agent.run_sync("Close half my BTC", deps=mock_deps)
 
     mock_close.assert_called_once()
     assert mock_close.call_args.kwargs["symbol_or_asset_id"] == "BTC"
     assert mock_close.call_args.kwargs["percentage"] == 0.5
-
-
-if __name__ == "__main__":
-    pytest.main(["-v", "-s", "tests/test_agent.py"])
