@@ -4,18 +4,23 @@ import time
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
+from core.agent import configure_model
 from core.runner import run_once
 from integrations.alpaca.config import load_config
 from schemas.deps import Deps
+
+# model format is <provide_namer:model_name.
+MODEL = "anthropic:claude-3-5-haiku-latest"
 
 
 def main():
     load_dotenv()
 
+    configure_model(MODEL, strict=True)
+
     deps = Deps(
         alpaca=load_config(),
         tavily=TavilyClient(api_key=os.environ["TAVILY_API_KEY"]),
-        # change to True when you actually want to execute trades
         allow_trading=False,
     )
 

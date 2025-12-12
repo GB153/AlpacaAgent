@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any, Literal
 
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.models.test import TestModel
 
 from core.routing import build_model
 from integrations.alpaca.account import get_account as alpaca_get_account
@@ -14,11 +15,8 @@ from integrations.tavily.search import web_search as tavily_web_search
 from schemas.deps import Deps
 from schemas.output import AgentResult
 
-# to change the model -- look for the global variable MODEL
-model = build_model(strict=True)
-
 agent = Agent(
-    model,
+    TestModel(),
     deps_type=Deps,
     output_type=AgentResult,
     instructions=(
@@ -33,6 +31,16 @@ agent = Agent(
     ),
     retries=3,
 )
+
+
+def configure_model(model_spec: str, *, strict: bool = True):
+    """
+    Call from main.py at runtime.
+    """
+    model = build_model(model_spec, strict=strict)
+    if model is not None:
+        agent.model = model
+    return agent.model
 
 
 @agent.tool
