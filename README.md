@@ -16,7 +16,7 @@ NOTE: To change level of logging, simply navigate to utils/logging.py and change
 
 ---
 
-## Setup/Requirements
+## Setup
 
 - Python 3.11+
 - `uv` (recommended) or `pip`

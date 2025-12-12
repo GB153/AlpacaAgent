@@ -1,16 +1,17 @@
 [project]
 name = "agents"
-version = "0.1.0"
-description = "MVP for crypto-trading ai agent"
+version = "0.1.1"
+description = "A crypto-trading bot using Alpaca"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.75.0",
-    "asyncio>=4.0.0",
-    "dotenv>=0.9.9",
     "fastapi>=0.122.0",
     "pydantic>=2.12.5",
     "pydantic-ai>=1.25.1",
     "pydantic-ai-slim[anthropic]>=1.25.1",
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+    "python-dotenv>=1.2.1",
     "tavily>=1.1.0",
 ]
