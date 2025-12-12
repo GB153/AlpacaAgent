@@ -9,8 +9,7 @@ A small, opinionated template for building an “agentic” crypto research + tr
 
 This is intentionally minimal - feel free to fork or suggest PRs to add to existing codebase. This acts more as an experiment to let the model 'think' for itself and reason what to do next whilst providing the necessary tools to act on it. 
 
-NOTE: To change the model use, navigate to core/agent.py where it will be listed below imports. It would be useful to
-make this more compatible with other models, this demo only uses anthropic,
+NOTE: To change the model use, navigate to main.py - most models are supported from Ollama to OpenAI. If it is supported by PydanticAI, it can be used.
 
 NOTE: To change level of logging, simply navigate to utils/logging.py and change to logging.INFO for all logs.
 
@@ -32,7 +31,7 @@ and secrets from corresponding sources:
   ```
   TAVILY_API_KEY=your_tavily_key_here
   ALPACA_KEY=your_alpaca_key_id_here
-  APCA_API_SECRET_KEY=your_alpaca_secret_key_here
+  ALPACA_SECRET=your_alpaca_secret_key_here
   ALPACA_URL=https://paper-api.alpaca.markets/v2
   ANTHROPIC_API_KEY= your_anthropic_key_here
   ```

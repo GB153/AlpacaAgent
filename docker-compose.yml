@@ -4,6 +4,9 @@ services:
     container_name: crypto-agent
     env_file:
       - .env
+    environment:
+      STATE_DB_PATH: /app/state/state.db
+      STATE_KEY: sol-agent
     volumes:
       - ./state:/app/state
     restart: unless-stopped

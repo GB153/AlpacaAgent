@@ -2,3 +2,15 @@
 .venv
 *.__pycache__
 *.zed
+
+# state
+state/*.db
+state/*.db-wal
+state/*.db-shm
+
+# sqlite
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
